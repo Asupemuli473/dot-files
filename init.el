@@ -5,8 +5,10 @@
 
 ;; set up packages
 (add-to-list 'package-archives
-	     '("melpa" . "http://melpa.org/packages/"))
+	     '("melpa" . "https://melpa.org/packages/"))
 
+;; (add-to-list 'package-archives
+;; 	     '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -15,7 +17,7 @@
 
 
 ;;personal info
-(setq user-mail-address "") ;; TODO set up email
+(setq user-mail-address "utduu@student.kit.edu")
 (setq language-environment "Latin-1")
 
 ;;setting up calendar location
@@ -43,23 +45,25 @@
   :ensure t
   :config (which-key-mode))
 
+
 (use-package org-journal
   :ensure t
   :config
   (progn
-  (setq org-journal-dir "") ;; TODO journal directory
+  (setq org-journal-dir "~/org/journal") 
   (global-set-key (kbd "C-x j") 'org-journal-new-entry)))
 
-(use-package multi-web-mode
-  :ensure t
-  :config
-  (progn
-  (setq mweb-default-major-mode 'html-mode)
-  (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-		    (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
-		    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
-  (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
-  (multi-web-global-mode 1)))
+
+;; (use-package multi-web-mode
+;;   :ensure t
+;;   :config
+;;   (progn
+;;   (setq mweb-default-major-mode 'html-mode)
+;;   (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+;; 		    (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+;; 		    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+;;   (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+;;   (multi-web-global-mode 1)))
   
 (use-package ace-window
   :ensure t
@@ -88,11 +92,9 @@
 
 (use-package avy
   :ensure
-  :bind (("M-g c" . avy-goto-char)
-	 ("M-g C" . avy-goto-char-2)
-	 ("M-g w" . avy-goto-word-1)
-	 ("M-g W" . avy-goto-word-0)
-	 ("M-g l" . avy-goto-line)))
+  :bind (("C-+" . avy-goto-char)
+	 ("C-ä" . avy-goto-word-1)
+	 ("C-#" . avy-goto-line)))
 
 ;;org-mode stuff
 ;;keys to access org functionality
@@ -100,6 +102,7 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key "\C-cp" 'org-pomodoro)
 
 (setq org-log-done 'time)
 
@@ -112,13 +115,18 @@
  '(Org-modules
    (quote
     (org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-rmail org-w3m)))
+ '(custom-safe-themes
+   (quote
+    ("e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" default)))
  '(initial-buffer-choice t)
- '(org-agenda-files (quote (""))) ;; TODO setup agenda file dir
+ '(org-agenda-files (quote ("~/org/")))
  '(org-log-into-drawer (quote LOGBOOK))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-docview org-gnus org-habit org-info org-irc org-mhe org-rmail org-w3m)))
- '(package-selected-packages (quote (multi-web-mode org-journal))))
+ '(package-selected-packages
+   (quote
+    (rtags org-pomodoro lua-mode multi-web-mode org-journal))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -126,9 +134,14 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; Hotkeys
-(global-set-key (kbd "C-C C-/") 'comment-dwim)
+(load-theme 'zenburn)
 
 
-(load-theme 'leuven)
-(setq default-directory "") ;; TODO setup default dir
+(use-package rtags
+  :ensure t
+  :bind ("M-g d" . rtags-find-symbol-at-point))
+
+(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+(add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
+	 
