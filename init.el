@@ -94,39 +94,103 @@
   :ensure
   :bind (("C-+" . avy-goto-char)
 	 ("C-ä" . avy-goto-word-1)
-	 ("C-#" . avy-goto-line)))
+	 ("M-g h" . avy-goto-line)))
 
 ;;org-mode stuff
+(setq org-agenda-files (list "~/org"))
+
 ;;keys to access org functionality
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cp" 'org-pomodoro)
 
 (setq org-log-done 'time)
 
-;;set agenda files
+
+(use-package org-pomodoro
+  :ensure t
+  :bind ("\C-cp" . 'org-pomodoro))
+
+(use-package zenburn-theme
+  :ensure t
+  :config (load-theme 'zenburn t))
+
+
+(use-package lua-mode
+  :ensure t) 
+
+(use-package rtags
+  :ensure t
+  :bind ("M-g d" . rtags-find-symbol-at-point))
+;; TODO: set rtags path + automatic installation
+
+(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+(add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
+
+(use-package company
+  :ensure t)
+(add-hook 'after-init-hook 'global-company-mode)
+
+(use-package company-rtags
+  :ensure t)
+
+(setq rtags-autostart-diagnostics t)
+(setq rtags-completions-enabled t)
+(push 'company-rtags company-backends)
+(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+
+(use-package flycheck
+  :ensure t)
+
+(use-package flycheck-rtags
+  :ensure t)
+
+(defun my-flycheck-rtags-setup ()
+  (flycheck-select-checker 'rtags)
+  (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+  (setq-local flycheck-check-syntax-automatically nil))
+(add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
+(add-hook 'c++-mode-hook #'my-flycheck-rtags-setup)
+(add-hook 'objc-mode-hook #'my-flycheck-rtags-setup)
+
+
+
+(use-package helm
+  :ensure t)
+
+(global-set-key (kbd "M-x") 'helm-M-x)
+(helm-mode 1)
+
+;; (use-package irony
+;;   :ensure t)
+
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'objc-mode-hook 'irony-mode)
+
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+
+
+(set-face-attribute 'default nil
+                    :family "Inconsolata"
+                    :height 120
+                    :weight 'normal)
+
+(global-set-key "\C-xr" 'replace-string)
+
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(Org-modules
-   (quote
-    (org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-rmail org-w3m)))
- '(custom-safe-themes
-   (quote
-    ("e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" default)))
- '(initial-buffer-choice t)
- '(org-agenda-files (quote ("~/org/")))
- '(org-log-into-drawer (quote LOGBOOK))
- '(org-modules
-   (quote
-    (org-bbdb org-bibtex org-docview org-gnus org-habit org-info org-irc org-mhe org-rmail org-w3m)))
  '(package-selected-packages
    (quote
-    (rtags org-pomodoro lua-mode multi-web-mode org-journal))))
+    (helm flycheck-rtags company-rtags irony flycheck company company-mode rtags zenburn-theme which-key use-package try org-pomodoro org-journal lua-mode counsel ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -134,14 +198,13 @@
  ;; If there is more than one, they won't work right.
  )
 
-(load-theme 'zenburn)
+(global-set-key (kbd "C-x C-o") 'ff-find-other-file)
+
+(add-hook 'c-mode-hook 'electric-pair-mode)
+(add-hook 'c++-mode-hook 'electric-pair-mode)
+(add-hook 'objc-mode-hook 'electric-pair-mode)
+
+(global-set-key (kbd "M-g o") 'imenu)
 
 
-(use-package rtags
-  :ensure t
-  :bind ("M-g d" . rtags-find-symbol-at-point))
-
-(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-(add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
-	 
+(setq-default c-basic-offset 4)
