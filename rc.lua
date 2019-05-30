@@ -60,24 +60,28 @@ modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
-    awful.layout.suit.floating,
+    -- awful.layout.suit.floating,
     awful.layout.suit.tile,
     awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
     awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
+    -- awful.layout.suit.fair.horizontal,
+    -- awful.layout.suit.spiral,
+    -- awful.layout.suit.spiral.dwindle,
+    -- awful.layout.suit.max,
     awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.corner.nw,
+    -- awful.layout.suit.magnifier,
+    -- awful.layout.suit.corner.nw,
     -- awful.layout.suit.corner.ne,
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
 }
 -- }}}
+
+
+
+
 
 -- {{{ Helper functions
 local function client_menu_toggle_fn()
@@ -214,7 +218,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             mytextclock,
-	    require("battery-widget"){}
+	    require("battery-widget"){},
         },
     }
 end)
@@ -232,6 +236,8 @@ root.buttons(gears.table.join(
 globalkeys = gears.table.join(
      --My bindings
     awful.key({ modkey,    }, "f", function() awful.util.spawn_with_shell("firefox") end),
+    awful.key({ modkey,    }, "p", function() awful.util.spawn_with_shell("keepassx2") end),
+    awful.key({ modkey,	   }, "d", function() awful.util.spawn_with_shell("nautilus") end),
 awful.key({ modkey,    }, "e", function() awful.util.spawn_with_shell('emacsclient -a "" -c') end),
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
@@ -326,10 +332,10 @@ awful.key({ modkey,    }, "e", function() awful.util.spawn_with_shell('emacsclie
                     history_path = awful.util.get_cache_dir() .. "/history_eval"
                   }
               end,
-              {description = "lua execute prompt", group = "awesome"}),
+              {description = "lua execute prompt", group = "awesome"})
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"})
+    -- awful.key({ modkey }, "p", function() menubar.show() end,
+       --       {description = "show the menubar", group = "launcher"})
 )
 
 clientkeys = gears.table.join(
@@ -559,3 +565,17 @@ client.connect_signal("focus", function(c) c.border_color = beautiful.border_foc
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
+os.execute("setxkbmap de")
+
+
+autorun = true
+autorunApps =
+{
+	"owncloud",
+	"blueman-applet"
+}
+if autorun then
+   for app = 1, #autorunApps do
+       awful.util.spawn(autorunApps[app])
+       end
+end
