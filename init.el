@@ -16,7 +16,7 @@
 
 
 ;;personal info
-(setq user-mail-address "utduu@student.kit.edu")
+
 (setq language-environment "Latin-1")
 
 ;;setting up calendar location
@@ -43,12 +43,13 @@
   :ensure t
   :config (which-key-mode))
 
-
 (use-package org-journal
   :ensure t
-  :config
-  (setq org-journal-dir "~/ownCloud/org/notes/") 
-  (global-set-key (kbd "C-x j") 'org-journal-new-entry))
+  :defer t
+  :custom
+  (org-journal-dir "~/ownCloud/org/journal/")
+  (org-journal-encrypt-journal t))
+(global-set-key (kbd "C-c j") 'org-journal-new-entry)
 
 (use-package powerline
   :ensure t
@@ -107,11 +108,6 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 
 (setq org-log-done 'time)
-
-
-(use-package org-pomodoro
-  :ensure t
-  :bind ("\C-cp" . 'org-pomodoro))
 
 (use-package zenburn-theme
   :ensure t
@@ -213,7 +209,7 @@
  '(org-pomodoro-length 1)
  '(package-selected-packages
    (quote
-    (opencl-mode shell-here yaml-mode php-mode neotree ess helm irony flycheck company company-mode zenburn-theme which-key use-package try org-pomodoro org-journal lua-mode counsel ace-window)))
+    (opencl-mode shell-here yaml-mode php-mode neotree ess helm irony flycheck company company-mode zenburn-theme which-key use-package try org-pomodoro lua-mode counsel ace-window)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-color-map
@@ -281,3 +277,36 @@
 (setq org-directory "~/ownCloud/org")
 (setq org-default-notes-file (concat org-directory "/capture.org"))
 (global-set-key (kbd "C-c t") (lambda () (interactive) (find-file (concat org-directory "/todo.org"))))
+(global-set-key (kbd "C-c p") (lambda () (interactive) (find-file (concat org-directory "/plan.org"))))
+(global-set-key (kbd "C-c u") (lambda () (interactive) (find-file (concat org-directory "/uni.org"))))
+
+(defun my/copy-idlink-to-clipboard() "Copy an ID link with the
+headline to killring, if no ID is there then create a new unique
+ID.  This function works only in org-mode or org-agenda buffers. 
+
+The purpose of this function is to easily construct id:-links to 
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+       (interactive)
+       (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
+     (org-agenda-show)
+     (org-agenda-goto))       
+       (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+     (setq mytmphead (nth 4 (org-heading-components)))
+         (setq mytmpid (funcall 'org-id-get-create))
+     (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+     (kill-new mytmplink)
+     (message "Copied %s to killring (clipboard)" mytmplink)
+       ))
+(global-set-key (kbd "C-c s") 'my/copy-idlink-to-clipboard)
+
+(setq org-capture-templates
+      '(("t" "Todo" entry (file "~/ownCloud/org/todo.org")
+         "* TODO %? %^G")
+	("e" "Event" entry (file "~/ownCloud/org/agenda.org")
+	 "* %? %^G \n%^t\n  ")
+	("p" "Plan" entry (file "~/ownCloud/org/plan.org")
+	 "* %^u\n** TODOS [/]\n  -\n** Agenda\n")
+	("n" "Note" entry (file "~/ownCloud/org/notes.org")
+	 "* %? %^G\n  %i\n  %a")))
+
